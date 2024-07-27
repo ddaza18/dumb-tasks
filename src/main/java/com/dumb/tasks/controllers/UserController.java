@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authorization.method.AuthorizeReturnObject;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,6 +17,7 @@ import com.dumb.tasks.services.UserService;
 
 @RestController
 @RequestMapping("/dumb/users")
+@AuthorizeReturnObject
 public class UserController {
 	
 	@Autowired
@@ -23,6 +25,7 @@ public class UserController {
 	
 	@GetMapping
 	public List<User> findAll(){
+		System.out.println("Ejecutando servicio de listar usuarios -> 200 OK");
 		return service.findAll();
 	}
 	
@@ -49,6 +52,7 @@ public class UserController {
 			userActOrNew.setPassword(user.getPassword());
 			userActOrNew.setPhone(user.getPhone());
 			userActOrNew.setUpdateDate(new Date());
+			userActOrNew.setRoles(user.getRoles());
 		}else {
 			userActOrNew = new User();
 			userActOrNew.setId(id);
@@ -59,6 +63,7 @@ public class UserController {
 			userActOrNew.setPhone(user.getPhone());
 			userActOrNew.setUpdateDate(new Date());
 			userActOrNew.setCreationDate(new Date());
+			userActOrNew.setRoles(user.getRoles());
 		}
 		
 		return service.saveUser(userActOrNew);
