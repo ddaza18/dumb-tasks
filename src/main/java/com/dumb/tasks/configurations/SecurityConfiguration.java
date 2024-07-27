@@ -5,21 +5,16 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.authorization.method.AuthorizationAdvisorProxyFactory;
-import org.springframework.security.authorization.method.AuthorizeReturnObject;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.security.web.util.matcher.RequestMatcher;
-import org.springframework.util.AntPathMatcher;
+
+import com.dumb.tasks.services.CustomerDetailService;
 
 import jakarta.servlet.DispatcherType;
 
@@ -33,17 +28,26 @@ public class SecurityConfiguration{
 		http.csrf( csrf -> csrf.disable())
 				.httpBasic(Customizer.withDefaults())
 				.authorizeRequests(auth -> 
-				auth.dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()); 
+				auth.dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
+				.requestMatchers("/dumb/**").permitAll()
+				.requestMatchers("/auth").permitAll()
+				.requestMatchers("/home").hasAnyRole("ADMIN", "USER").anyRequest().authenticated()); 
 		http.formLogin(login -> login
 				.loginPage("/auth").permitAll()
-				.defaultSuccessUrl("/home").permitAll()
-				.failureUrl("/auth?error=true").permitAll());
+				.defaultSuccessUrl("/home", true));
 		http.logout(logout -> logout
 				.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
 				.logoutSuccessUrl("/auth?logout=true"));
+		http.headers(header -> header
+				.cacheControl(cacheControl -> cacheControl.disable()));
 		
 		return http.build();
 	}
+	
+	@Bean
+    PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 	
 	@Bean
     AuthenticationProvider authenticationProvider() {
@@ -52,15 +56,11 @@ public class SecurityConfiguration{
         authenticationProvider.setPasswordEncoder(passwordEncoder());
         return authenticationProvider;
     }
-	
-	@Bean
-	PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder(); 
-	}
     
     @Bean
      UserDetailsService userDetailsManager() {
-    	PasswordEncoder encoder = passwordEncoder();
+    	//Activar unicamente si NO es necesario los usuarios en BD para la autenticación
+    	/*PasswordEncoder encoder = passwordEncoder();
     	InMemoryUserDetailsManager managerUserDetails = new InMemoryUserDetailsManager();
     	
     	managerUserDetails.createUser(User.withUsername("user")
@@ -71,17 +71,14 @@ public class SecurityConfiguration{
     	managerUserDetails.createUser(User.withUsername("admin")
     			.password(encoder.encode("123qwe"))
     			.roles("ADMIN")
-    			.build());
+    			.build());*/
     	
-    	return managerUserDetails;
+    	return new CustomerDetailService();
     }
     
     @Bean
      Customizer<AuthorizationAdvisorProxyFactory> skipValuesTypes(){
     	return (factory) -> factory.setTargetVisitor(AuthorizationAdvisorProxyFactory.TargetVisitor.defaultsSkipValueTypes()); 
     }
-    
-    
-
 }
 	

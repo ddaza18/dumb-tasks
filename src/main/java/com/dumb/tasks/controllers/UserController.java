@@ -46,7 +46,7 @@ public class UserController {
 		User userActOrNew;
 		if(userOptional.isPresent()) {
 			userActOrNew = userOptional.get();
-			userActOrNew.setLoginUser(user.getLoginUser());
+			userActOrNew.setUsername(user.getUsername());
 			userActOrNew.setFullName(user.getFullName());
 			userActOrNew.setMail(user.getMail());
 			userActOrNew.setPassword(user.getPassword());
@@ -56,7 +56,7 @@ public class UserController {
 		}else {
 			userActOrNew = new User();
 			userActOrNew.setId(id);
-			userActOrNew.setLoginUser(user.getLoginUser());
+			userActOrNew.setUsername(user.getUsername());
 			userActOrNew.setFullName(user.getFullName());
 			userActOrNew.setMail(user.getMail());
 			userActOrNew.setPassword(user.getPassword());
