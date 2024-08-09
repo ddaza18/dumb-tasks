@@ -30,14 +30,14 @@ public class SecurityConfiguration{
 				.authorizeRequests(auth -> 
 				auth.dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
 				.requestMatchers("/dumb/**").permitAll()
-				.requestMatchers("/auth").permitAll()
-				.requestMatchers("/home").hasAnyRole("ADMIN", "USER").anyRequest().authenticated()); 
+				.requestMatchers("/auth/**").permitAll()
+				.requestMatchers("/home/**").hasAnyRole("ADMIN", "USER").anyRequest().authenticated()); 
 		http.formLogin(login -> login
-				.loginPage("/auth").permitAll()
-				.defaultSuccessUrl("/home", true));
+				.loginPage("/auth/login").permitAll()
+				.defaultSuccessUrl("/home/tasks",true));
 		http.logout(logout -> logout
 				.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-				.logoutSuccessUrl("/auth?logout=true"));
+				.logoutSuccessUrl("/auth/login?logout=true"));
 		http.headers(header -> header
 				.cacheControl(cacheControl -> cacheControl.disable()));
 		
