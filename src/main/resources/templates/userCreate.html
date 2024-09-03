@@ -54,23 +54,23 @@
     <div class='dashboard-app'>
         <header class='dashboard-toolbar'><a href="#!" class="menu-toggle"><i class="fas fa-bars"></i></a></header>
         <div class="container">  
-            <form id="contact" action="#" method="post">
+            <form id="contact" action="/home/crearUser" method="POST">
               <h3>Create User</h3>
               <h4>All fields must be complete!</h4>
               <fieldset>
-                <input placeholder="Username" type="text" tabindex="1" required autofocus>
+                <input name="fullname" placeholder="Full Name" type="text" tabindex="1" required>
               </fieldset>
               <fieldset>
-                <input placeholder="Full Name" type="text" tabindex="2" required>
+                <input name="username" placeholder="Username" type="text" tabindex="2" required autofocus>
               </fieldset>
               <fieldset>
-                <input placeholder="Email" type="email" tabindex="3" required>
+                <input name="email" placeholder="Email" type="email" tabindex="3" required>
               </fieldset>
               <fieldset>
-                <input placeholder="Phone" type="number" tabindex="4" required>
+                <input name="phone" placeholder="Phone" type="number" tabindex="4" required>
               </fieldset>
               <fieldset>
-                <input placeholder="Password" type="password" tabindex="5" required>
+                <input name="password" placeholder="Password" type="password" tabindex="5" required>
               </fieldset>
               <fieldset>
                 <button name="submit" type="submit" id="contact-submit" data-submit="...Sending">Submit</button>
@@ -105,5 +105,25 @@
              }
          });
      });
+ </script>
+ <script>
+    $(document).ready(function(){
+        $("#contact").on("submit", function(event) {
+                event.preventDefault(); 
+                var form = $(this);
+                $.ajax({
+                    type: form.attr("method"),
+                    url: form.attr("action"),
+                    data: form.serialize(),
+                    success: function(response) {
+                        alert("User created successfully!");
+                        window.location.href = "/home/tasks";
+                    },
+                    error: function(response) {
+                        alert("There was an error creating the user.");
+                    }
+                });
+            });
+    });
  </script>
 </html>

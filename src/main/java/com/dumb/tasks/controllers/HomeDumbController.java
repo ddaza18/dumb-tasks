@@ -1,12 +1,21 @@
 package com.dumb.tasks.controllers;
 
+import java.time.LocalDateTime;
+import java.util.Date;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authorization.method.AuthorizeReturnObject;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import com.dumb.tasks.models.User;
 import com.dumb.tasks.repositorys.UserRepository;
@@ -43,5 +52,15 @@ public class HomeDumbController {
 		return "userCreate";
 	}
 	
-	
+	@PostMapping("/crearUser")
+	public ResponseEntity<String> crear(@ModelAttribute User user) {
+		try {
+			Date locaDate = new Date();
+			user.setCreationDate(locaDate);
+			userService.saveUser(user);	
+			return new ResponseEntity<>(HttpStatus.CREATED); 
+		}catch(Exception e) {
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 }
